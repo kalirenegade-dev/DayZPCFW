@@ -1,0 +1,6 @@
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Release\netcoreapp3.1\DayZPCFW.Form1.resources
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Release\netcoreapp3.1\DayZPCFW.vbproj.GenerateResource.cache
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Release\netcoreapp3.1\DayZPCFW.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Release\netcoreapp3.1\DayZPCFW.AssemblyInfoInputs.cache
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Release\netcoreapp3.1\DayZPCFW.AssemblyInfo.vb
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Release\netcoreapp3.1\DayZPCFW.vbproj.CoreCompileInputs.cache

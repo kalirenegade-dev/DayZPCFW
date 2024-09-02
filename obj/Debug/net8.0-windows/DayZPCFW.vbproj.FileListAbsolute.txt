@@ -1,0 +1,16 @@
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.Form1.resources
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.vbproj.GenerateResource.cache
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.AssemblyInfoInputs.cache
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.AssemblyInfo.vb
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.vbproj.CoreCompileInputs.cache
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\bin\Debug\net8.0-windows\DayZPCFW.exe
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\bin\Debug\net8.0-windows\DayZPCFW.deps.json
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\bin\Debug\net8.0-windows\DayZPCFW.runtimeconfig.json
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\bin\Debug\net8.0-windows\DayZPCFW.dll
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\bin\Debug\net8.0-windows\DayZPCFW.pdb
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.dll
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\refint\DayZPCFW.dll
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.pdb
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\DayZPCFW.genruntimeconfig.cache
+C:\Users\micha\source\repos\DayZPCFW\DayZPCFW\obj\Debug\net8.0-windows\ref\DayZPCFW.dll
