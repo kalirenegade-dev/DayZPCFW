@@ -52,19 +52,26 @@ Public Class Form1
     End Sub
 
     Private Sub EnsureFirewallRulesExist()
-        ' Check and create the inbound rule if it doesn't exist
-        Dim inboundCommand As String = $"netsh advfirewall firewall show rule name=""{RuleName}_Inbound"""
-        If Not ExecuteCommandAndCheckOutput(inboundCommand, "No rules match the specified criteria.") Then
-            inboundCommand = $"netsh advfirewall firewall add rule name=""{RuleName}_Inbound"" dir=in action=block program=""" & ExeLocation & """ enable=no"
-            ExecuteCommand(inboundCommand)
-        End If
+        ' Delete existing inbound and outbound rules
+        DeleteFirewallRules()
 
-        ' Check and create the outbound rule if it doesn't exist
-        Dim outboundCommand As String = $"netsh advfirewall firewall show rule name=""{RuleName}_Outbound"""
-        If Not ExecuteCommandAndCheckOutput(outboundCommand, "No rules match the specified criteria.") Then
-            outboundCommand = $"netsh advfirewall firewall add rule name=""{RuleName}_Outbound"" dir=out action=block program=""" & ExeLocation & """ enable=no"
-            ExecuteCommand(outboundCommand)
-        End If
+        ' Create new inbound rule
+        Dim inboundCommand As String = $"netsh advfirewall firewall add rule name=""{RuleName}_Inbound"" dir=in action=block program=""" & ExeLocation & """ enable=no"
+        ExecuteCommand(inboundCommand)
+
+        ' Create new outbound rule
+        Dim outboundCommand As String = $"netsh advfirewall firewall add rule name=""{RuleName}_Outbound"" dir=out action=block program=""" & ExeLocation & """ enable=no"
+        ExecuteCommand(outboundCommand)
+    End Sub
+
+    Private Sub DeleteFirewallRules()
+        ' Delete the inbound rule if it exists
+        Dim inboundCommand As String = $"netsh advfirewall firewall delete rule name=""{RuleName}_Inbound"""
+        ExecuteCommand(inboundCommand)
+
+        ' Delete the outbound rule if it exists
+        Dim outboundCommand As String = $"netsh advfirewall firewall delete rule name=""{RuleName}_Outbound"""
+        ExecuteCommand(outboundCommand)
     End Sub
 
     Private Sub EnableFirewallRules()
@@ -169,6 +176,7 @@ Public Class Form1
             MessageBox.Show("Error loading configuration: " & ex.Message)
         End Try
     End Sub
+
     Private Function ConvertHotkey(hotkey As String) As UInteger
         Try
             Select Case hotkey.ToUpper()
@@ -202,12 +210,11 @@ Public Class Form1
                     Dim key As Keys = [Enum].Parse(GetType(Keys), hotkey, True)
                     Return CUInt(key)
             End Select
-
-
         Catch ex As Exception
             Return &H0 ' Default to no hotkey if conversion fails
         End Try
     End Function
+
     Private Sub EnsureConfigFileExists()
         Dim configFilePath As String = "settings.cfg"
 

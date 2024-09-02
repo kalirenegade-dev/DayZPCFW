@@ -28,9 +28,10 @@ Partial Class Form1
         ' 
         ' Button1
         ' 
-        Button1.Location = New Point(12, 12)
+        Button1.Location = New Point(6, 6)
+        Button1.Margin = New Padding(2, 1, 2, 1)
         Button1.Name = "Button1"
-        Button1.Size = New Size(150, 46)
+        Button1.Size = New Size(81, 22)
         Button1.TabIndex = 0
         Button1.Text = "Start"
         Button1.UseVisualStyleBackColor = True
@@ -39,18 +40,20 @@ Partial Class Form1
         ' 
         ComboBox1.DropDownStyle = ComboBoxStyle.DropDownList
         ComboBox1.FormattingEnabled = True
-        ComboBox1.Location = New Point(168, 16)
+        ComboBox1.Location = New Point(94, 6)
+        ComboBox1.Margin = New Padding(2, 1, 2, 1)
         ComboBox1.Name = "ComboBox1"
-        ComboBox1.Size = New Size(166, 40)
+        ComboBox1.Size = New Size(91, 23)
         ComboBox1.TabIndex = 1
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(13F, 32F)
+        AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(366, 67)
+        ClientSize = New Size(227, 31)
         Controls.Add(ComboBox1)
         Controls.Add(Button1)
+        Margin = New Padding(2, 1, 2, 1)
         Name = "Form1"
         Text = "DayZ Lag"
         ResumeLayout(False)
