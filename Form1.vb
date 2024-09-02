@@ -7,6 +7,7 @@ Public Class Form1
     Private RuleName As String = "Lagger"
     Private ExeLocation As String
     Private Hotkey As UInteger
+    Public FounddayzPath As String = nothing
 
     ' Windows API functions for registering and unregistering hotkeys
     <DllImport("user32.dll", SetLastError:=True)>
@@ -19,8 +20,38 @@ Public Class Form1
 
     Private Const HOTKEY_ID As Integer = 1
     Private Const MOD_NONE As UInteger = &H0
+    Private Function GetDayzPath() As String
+        Dim steamPath As String = FindSteamPath()
+
+        If Not String.IsNullOrEmpty(steamPath) Then
+            Dim steamAppsPath As String = Path.Combine(steamPath, "steamapps")
+            Dim DayZPath As String = steamAppsPath & "\common\DayZ\DayZ_x64.exe"
+
+            If System.IO.File.Exists(DayZPath) Then
+                Return DayZPath
+            Else
+                Return ""
+            End If
+            Return DayZPath
+        Else
+            Return ""
+        End If
+        Return ""
+
+    End Function
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+
+        Dim dayzPath As String = GetDayzPath()
+        If (GetDayzPath() IsNot "") Then
+            FounddayzPath = dayzPath
+        Else
+            FounddayzPath = "C:\FindYourSteamAppFolder\steamapps\common\DayZ\DayZ_x64.exe"
+        End If
+
+
+
         ' Ensure the configuration file exists
         EnsureConfigFileExists()
 
@@ -52,26 +83,19 @@ Public Class Form1
     End Sub
 
     Private Sub EnsureFirewallRulesExist()
-        ' Delete existing inbound and outbound rules
-        DeleteFirewallRules()
+        ' Check and create the inbound rule if it doesn't exist
+        Dim inboundCommand As String = $"netsh advfirewall firewall show rule name=""{RuleName}_Inbound"""
+        If Not ExecuteCommandAndCheckOutput(inboundCommand, "No rules match the specified criteria.") Then
+            inboundCommand = $"netsh advfirewall firewall add rule name=""{RuleName}_Inbound"" dir=in action=block program=""" & ExeLocation & """ enable=no"
+            ExecuteCommand(inboundCommand)
+        End If
 
-        ' Create new inbound rule
-        Dim inboundCommand As String = $"netsh advfirewall firewall add rule name=""{RuleName}_Inbound"" dir=in action=block program=""" & ExeLocation & """ enable=no"
-        ExecuteCommand(inboundCommand)
-
-        ' Create new outbound rule
-        Dim outboundCommand As String = $"netsh advfirewall firewall add rule name=""{RuleName}_Outbound"" dir=out action=block program=""" & ExeLocation & """ enable=no"
-        ExecuteCommand(outboundCommand)
-    End Sub
-
-    Private Sub DeleteFirewallRules()
-        ' Delete the inbound rule if it exists
-        Dim inboundCommand As String = $"netsh advfirewall firewall delete rule name=""{RuleName}_Inbound"""
-        ExecuteCommand(inboundCommand)
-
-        ' Delete the outbound rule if it exists
-        Dim outboundCommand As String = $"netsh advfirewall firewall delete rule name=""{RuleName}_Outbound"""
-        ExecuteCommand(outboundCommand)
+        ' Check and create the outbound rule if it doesn't exist
+        Dim outboundCommand As String = $"netsh advfirewall firewall show rule name=""{RuleName}_Outbound"""
+        If Not ExecuteCommandAndCheckOutput(outboundCommand, "No rules match the specified criteria.") Then
+            outboundCommand = $"netsh advfirewall firewall add rule name=""{RuleName}_Outbound"" dir=out action=block program=""" & ExeLocation & """ enable=no"
+            ExecuteCommand(outboundCommand)
+        End If
     End Sub
 
     Private Sub EnableFirewallRules()
@@ -176,7 +200,6 @@ Public Class Form1
             MessageBox.Show("Error loading configuration: " & ex.Message)
         End Try
     End Sub
-
     Private Function ConvertHotkey(hotkey As String) As UInteger
         Try
             Select Case hotkey.ToUpper()
@@ -210,11 +233,12 @@ Public Class Form1
                     Dim key As Keys = [Enum].Parse(GetType(Keys), hotkey, True)
                     Return CUInt(key)
             End Select
+
+
         Catch ex As Exception
             Return &H0 ' Default to no hotkey if conversion fails
         End Try
     End Function
-
     Private Sub EnsureConfigFileExists()
         Dim configFilePath As String = "settings.cfg"
 
@@ -222,11 +246,90 @@ Public Class Form1
         If Not File.Exists(configFilePath) Then
             ' Create the configuration file with default settings
             Dim defaultConfig As String = "[Settings]" & Environment.NewLine &
-                                           "ExeLocation=C:\SteamLibrary\steamapps\common\DayZ\DayZ_x64.exe" & Environment.NewLine &
+                                           "ExeLocation=" & FounddayzPath & Environment.NewLine &
                                            "Hotkey=X"
 
             ' Write the default settings to the configuration file
             File.WriteAllText(configFilePath, defaultConfig)
         End If
     End Sub
+
+    Function IsRuleRelatedToExecutable(programPath As String, executableName As String) As Boolean
+        ' Check if the filename matches the specified executable name
+        Return programPath.ToLower().Contains(executableName.ToLower())
+    End Function
+    Sub DisableAnyExistingRules()
+        Dim executableName As String = "DayZ_x64.exe"
+        Try
+            ' Execute the netsh command to list all firewall rules
+            Dim psi As New ProcessStartInfo("netsh", "advfirewall firewall show rule name=all")
+            psi.RedirectStandardOutput = True
+            psi.UseShellExecute = False
+            psi.CreateNoWindow = True
+
+            Dim process As New Process()
+            process.StartInfo = psi
+            process.Start()
+
+            ' Read and process the command output line by line
+            Dim output As String = process.StandardOutput.ReadToEnd()
+            process.WaitForExit()
+
+            Dim ruleNames As New List(Of String)()
+            Dim currentRuleName As String = String.Empty
+            Dim lines As String() = output.Split(New String() {Environment.NewLine}, StringSplitOptions.None)
+
+            For Each line As String In lines
+                If line.Contains("Rule Name:") Then
+                    currentRuleName = line.Substring(line.IndexOf(":") + 1).Trim()
+                ElseIf line.Contains("Program:") AndAlso Not String.IsNullOrEmpty(currentRuleName) Then
+                    Dim programPath As String = line.Substring(line.IndexOf(":") + 1).Trim()
+                    If IsRuleRelatedToExecutable(programPath, executableName) Then
+                        ruleNames.Add(currentRuleName)
+                    End If
+                    currentRuleName = String.Empty ' Reset for next rule
+                End If
+            Next
+
+            ' Disable matching rules
+            For Each RuleName In ruleNames
+                Console.WriteLine($"Disabling rule: {RuleName}")
+                Dim disableProcess As New ProcessStartInfo("netsh", $"advfirewall firewall delete rule name=""{RuleName}""")
+                disableProcess.UseShellExecute = False
+                disableProcess.CreateNoWindow = True
+
+                Dim disableProc As New Process()
+                disableProc.StartInfo = disableProcess
+                disableProc.Start()
+                disableProc.WaitForExit()
+            Next
+
+            Console.WriteLine("Processing complete.")
+        Catch ex As Exception
+            Console.WriteLine($"An error occurred: {ex.Message}")
+        End Try
+    End Sub
+
+    Function FindSteamPath() As String
+        Dim defaultPaths As String() = {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Steam"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Steam")
+        }
+
+        For Each path In defaultPaths
+            If Directory.Exists(path) Then
+                Return path
+            End If
+        Next
+
+        ' If not found, you might consider searching for the Steam folder or reading the registry
+        ' Example for searching within the user profile directory:
+        Dim possiblePath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Steam")
+        If Directory.Exists(possiblePath) Then
+            Return possiblePath
+        End If
+
+        ' Add any other custom paths or search logic here
+        Return String.Empty
+    End Function
 End Class
